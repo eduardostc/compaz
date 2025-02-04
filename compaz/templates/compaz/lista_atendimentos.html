@@ -1,0 +1,8 @@
+<!-- atendimento/templates/atendimento/lista_atendimentos.html -->
+
+<h1>Lista de Atendimentos</h1>
+<ul>
+    {% for atendimento in atendimentos %}
+    <li>{{ atendimento.nome_cidadao }} - {{ atendimento.data_atendimento }}</li>
+    {% endfor %}
+</ul>

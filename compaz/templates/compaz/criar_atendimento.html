@@ -1,0 +1,8 @@
+<!-- atendimento/templates/atendimento/criar_atendimento.html -->
+
+<h1>Criar Atendimento</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Salvar</button>
+</form>
