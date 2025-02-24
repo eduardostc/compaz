@@ -25,3 +25,29 @@ def lista_atendimentos(request):
     #atendimentos = Atendimento.objects.all() #odos os usuários podem ver todos os atendimentos
     return render(request, 'compaz/lista_atendimentos.html', {'atendimentos': atendimentos})
 
+
+
+
+# def signup(request):
+#     if request.method == 'POST':
+#         form = SignUpForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             login(request, user)  # Loga o usuário após o cadastro
+#             return redirect('criar_atendimento')  # Redireciona para a página de criação de atendimento
+#     else:
+#         form = SignUpForm()  # Usa o formulário personalizado
+#     return render(request, 'registration/signup.html', {'form': form})
+
+
+# from django.shortcuts import redirect
+# from django.contrib.auth import login as auth_login
+
+# def login(request):
+#     if request.method == 'POST':
+#         # Lógica de autenticação
+#         user = authenticate(request, username=request.POST['username'], password=request.POST['password'])
+#         if user is not None:
+#             auth_login(request, user)
+#             return redirect('pagina_personalizada')  # Redireciona para uma página personalizada
+#     return render(request, 'registration/login.html')

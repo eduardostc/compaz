@@ -24,3 +24,6 @@ __pycache__/
 # Arquivos de log e temporários
 *.log
 *.tmp
+
+#arquivo de teste
+htmlcov/*

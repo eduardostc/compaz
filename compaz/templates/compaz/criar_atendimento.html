@@ -6,3 +6,12 @@
     {{ form.as_p }}
     <button type="submit">Salvar</button>
 </form>
+
+<!-- Botão de logout -->
+<div style="margin-top: 20px;">
+    <a href="{% url 'logout' %}" style="text-decoration: none;">
+        <button type="button" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; cursor: pointer;">
+            Logout
+        </button>
+    </a>
+</div>

@@ -13,7 +13,7 @@ SECRET_KEY = 'django-insecure-erzsl2wgc=yq$b0q9z3t6a5&#=!r)y4f(nh%))%%u#+j2aoy^t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -94,9 +94,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Sao_Paulo'
 
 USE_I18N = True
 
@@ -107,14 +107,41 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-######
-LOGIN_REDIRECT_URL = '/atendimento/criar/'  # Redireciona para a página de criação de atendimento após o login
+# Redireciona para a página de criação de atendimento após o login
+LOGIN_REDIRECT_URL = '/compaz/criar/'
 
 # Modelo personalizado
-#AUTH_USER_MODEL = 'compaz.CustomUser'
+AUTH_USER_MODEL = 'compaz.CustomUsuario'
+
+# settings.py coloca a 'Data do atendimento' no formato brasileiro
+DATE_INPUT_FORMATS = [
+    '%d/%m/%Y',  # Formato brasileiro
+    '%Y-%m-%d',  # Formato ISO (padrão do Django)
+]
+
+LOGIN_REDIRECT_URL = 'criar_atendimento'
+LOGOUT_REDIRECT_URL = 'login'
+#LOGIN_URL = '/users/login'
+
+# Configurações de e-mail (para testes)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Configurações de e-mail (para produção)
+# Exemplo usando SMTP do Gmail:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = 'seu-email@gmail.com'
+# EMAIL_HOST_PASSWORD = 'sua-senha'
+# DEFAUTL_FROM_EMAIL = 'contato@fusion.com.br'
+# EMAIL_HOST_USER = 'no-reply@fusion.com.br'
