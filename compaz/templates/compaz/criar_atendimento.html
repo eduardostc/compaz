@@ -1,4 +1,9 @@
 <!-- atendimento/templates/atendimento/criar_atendimento.html -->
+{% if user.is_authenticated %}
+    <p>Bem-vindo, {{ user.first_name }} {{ user.last_name }}!</p>
+{% else %}
+    <p>Bem-vindo, visitante!</p>
+{% endif %}
 
 <h1>Criar Atendimento</h1>
 <form method="post">

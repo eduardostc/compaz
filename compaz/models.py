@@ -42,8 +42,11 @@ class CustomUsuario(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'fone']
 
+    # def __str__(self):
+    #     return self.email
     def __str__(self):
-        return self.email
+        return f"{self.first_name} {self.last_name}".strip()
+
     
     objects = UsuarioManager()
 

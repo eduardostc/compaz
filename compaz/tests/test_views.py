@@ -1,5 +1,3 @@
-# compaz/tests/test_views.py
-
 from django.test import TestCase, Client
 from django.urls import reverse
 from compaz.models import CustomUsuario, LocalServico, Area, Atendimento
@@ -44,7 +42,7 @@ class AtendimentoViewsTest(TestCase):
         # Testa a view criar_atendimento com método POST
         self.client.force_login(self.user)  # Autentica o usuário
         data = {
-            'atendente': self.user.id,
+            'atendente': self.user.id,  # Agora referenciado pelo ID
             'email_atendente': self.user.email,
             'data_atendimento': '2023-10-01',
             'turno': 'manha',
@@ -81,3 +79,6 @@ class AtendimentoViewsTest(TestCase):
         self.assertIn('atendimentos', response.context)  # Usar response.context em vez de response.context_data
         self.assertEqual(len(response.context['atendimentos']), 1)
         self.assertEqual(response.context['atendimentos'][0], atendimento)
+
+        # Testa se o atendente aparece com o nome completo
+        self.assertEqual(str(atendimento.atendente), "Test User")

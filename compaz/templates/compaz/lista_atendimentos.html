@@ -8,8 +8,13 @@
 </ul> {% endcomment %}
 
 
-<ul>
+{% comment %} <ul>
     {% for atendimento in atendimentos %}
         <li>{{ atendimento.nome_servico }} - {{ atendimento.nome_cidadao }} - {{ atendimento.data_atendimento }}</li>
     {% endfor %}
-</ul>
+</ul> {% endcomment %}
+
+
+{% for atendimento in atendimentos %}
+    <p>Atendente: {{ atendimento.atendente }}</p>
+{% endfor %}

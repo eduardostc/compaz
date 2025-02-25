@@ -20,7 +20,8 @@ class AtendimentoFormTest(TestCase):
         """Testa se os campos do formulário são inicializados corretamente com um usuário."""
         form = AtendimentoForm(user=self.user)
 
-        self.assertEqual(form.initial['atendente'], self.user.id)
+        #self.assertEqual(form.initial['atendente'], self.user.get_full_name())
+        self.assertEqual(str(form.initial['atendente']), self.user.get_full_name())
         self.assertTrue(form.fields['atendente'].disabled)
 
         self.assertEqual(form.initial['email_atendente'], self.user.email)
@@ -37,15 +38,28 @@ class AtendimentoFormTest(TestCase):
         form = AtendimentoForm()
         self.assertIsInstance(form.fields['nome_servico'].choices, list)
 
-    @patch('requests.get')  # Simulando erro na API
-    def test_api_servicos_falha(self, mock_get):
-        """Testa se o formulário lida corretamente com erro na API"""
-        mock_get.side_effect = Exception("Erro simulado na API")
+    # @patch('requests.get')  # Simulando erro na API
+    # def test_api_servicos_falha(self, mock_get):
+    #     """Testa se o formulário lida corretamente com erro na API"""
+    #     mock_get.side_effect = Exception("Erro simulado na API")
         
-        form = AtendimentoForm()
+    #     form = AtendimentoForm()
         
-        # Verifica se a lista de serviços foi definida como vazia
-        self.assertEqual(form.fields['nome_servico'].choices, [])
+    #     # Verifica se a lista de serviços foi definida como vazia
+    #     self.assertEqual(form.fields['nome_servico'].choices, [])
+    def test_api_servicos_falha(self):
+        """
+        Testa se o formulário lida corretamente com erro na API.
+        """
+        with patch('requests.get') as mock_get:
+            # Simula um erro na API
+            mock_get.side_effect = Exception("Erro simulado na API")
+
+            # Cria o formulário
+            form = AtendimentoForm(user=self.user)
+
+            # Verifica se as escolhas do campo nome_servico estão corretas
+            self.assertEqual(form.fields['nome_servico'].choices, [('', 'Selecione um serviço')])
 
 
 class CustomUsuarioCreateFormTest(TestCase):

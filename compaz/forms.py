@@ -31,10 +31,13 @@ class AtendimentoForm(forms.ModelForm):
         super(AtendimentoForm, self).__init__(*args, **kwargs)
 
         if user:
-            self.initial['atendente'] = user.id
+            self.initial['atendente'] = user
+            self.fields['atendente'].queryset = CustomUsuario.objects.filter(id=user.id)
             self.fields['atendente'].disabled = True
+            
             self.initial['email_atendente'] = user.email
             self.fields['email_atendente'].disabled = True
+
             self.initial['data_atendimento'] = datetime.now().date()
             self.fields['data_atendimento'].disabled = True
 
@@ -43,15 +46,20 @@ class AtendimentoForm(forms.ModelForm):
         self.initial['turno'] = 'manha' if 6 <= hora_atual < 12 else 'tarde'
         self.fields['turno'].widget.attrs['disabled'] = 'disabled'
 
+        # Adiciona uma opção padrão ao campo nome_servico
+        self.fields['nome_servico'].choices = [('', 'Selecione um serviço')]
+
         # Buscar serviços da API
         try:
             response = requests.get('https://carta-servicos-service.app.recife.pe.gov.br/cats/servicos?user_key=54db39aa505b40e86f020769a5d05097&quantidade=9999')
             data = response.json()
             servicos = data.get("resposta", {}).get("dados", [])
-            self.fields['nome_servico'].choices = [(servico["nome"], servico["nome"]) for servico in servicos]
+            # Adiciona os serviços da API às escolhas existentes
+            self.fields['nome_servico'].choices += [(servico["nome"], servico["nome"]) for servico in servicos]
         except Exception as e:
             print(f"Erro ao buscar serviços da API: {e}")
-            self.fields['nome_servico'].choices = []
+            # Mantém a opção padrão em caso de erro
+            self.fields['nome_servico'].choices = [('', 'Selecione um serviço')]
 
 class CustomUsuarioCreateForm(UserCreationForm):
     class Meta:

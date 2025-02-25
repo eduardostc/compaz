@@ -63,7 +63,8 @@ class ModelsTestCase(TestCase):
 
     def test_custom_usuario_str(self):
         """Testa o método __str__ do modelo CustomUsuario"""
-        self.assertEqual(str(self.usuario), self.usuario.email)
+        #self.assertEqual(str(self.usuario), self.usuario.email)
+        self.assertEqual(str(self.usuario), f"{self.usuario.first_name} {self.usuario.last_name}".strip())
 
     def test_local_servico_str(self):
         """Testa o método __str__ do modelo LocalServico"""
