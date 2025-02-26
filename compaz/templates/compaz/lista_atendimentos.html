@@ -18,3 +18,26 @@
 {% for atendimento in atendimentos %}
     <p>Atendente: {{ atendimento.atendente }}</p>
 {% endfor %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Atendente</th>
+            <th>Local do Serviço</th>
+            <th>Data</th>
+            <th>Nome do Cidadão</th>
+            <!-- Outros campos -->
+        </tr>
+    </thead>
+    <tbody>
+        {% for atendimento in atendimentos %}
+            <tr>
+                <td>{{ atendimento.atendente }}</td>
+                <td>{{ atendimento.local_servico }}</td>
+                <td>{{ atendimento.data_atendimento }}</td>
+                <td>{{ atendimento.nome_cidadao }}</td>
+                <!-- Outros campos -->
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

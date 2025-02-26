@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import Atendimento
+from .models import Atendimento, LocalServico
 from compaz.models import CustomUsuario  # Importa o modelo da app usuario
 import requests
 from datetime import datetime
@@ -11,13 +11,19 @@ class AtendimentoForm(forms.ModelForm):
         choices=Atendimento.FORMA_ATENDIMENTO_CHOICES,
         widget=forms.Select(attrs={'class': 'form-control'}),
     )
+    local_servico = forms.ModelChoiceField(
+        queryset=LocalServico.objects.all(),
+        required=False,  # Defina como True se o campo for obrigatório
+        label="Local do Serviço"
+    )
 
     class Meta:
         model = Atendimento
         fields = [
             'atendente', 'email_atendente', 'data_atendimento', 'turno',
             'local_servico', 'area', 'nome_servico', 'nome_cidadao',
-            'telefone_cidadao', 'forma_atendimento', 'problema_resolvido'
+            'telefone_cidadao', 'forma_atendimento', 'problema_resolvido',
+            'local_servico'
         ]
         widgets = {
             'data_atendimento': forms.DateInput(
