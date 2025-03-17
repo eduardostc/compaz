@@ -19,6 +19,7 @@ urlpatterns = [
 
     # Inclui as URLs da aplicação compaz
     path('compaz/', include('compaz.urls')),
+    
 ]
 
 # Personalização do painel administrativo

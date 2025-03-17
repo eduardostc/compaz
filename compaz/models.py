@@ -47,6 +47,14 @@ class CustomUsuario(AbstractUser):
         verbose_name='Local do Serviço'
     )
 
+    area = models.ForeignKey(
+        'Area',  # Referência ao modelo Area
+        on_delete=models.SET_NULL,  # Define o comportamento ao excluir a Area
+        null=True,  # Permite que o campo seja nulo
+        blank=True,  # Permite que o campo seja deixado em branco no formulário
+        verbose_name='Área'
+    )
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'fone']
 

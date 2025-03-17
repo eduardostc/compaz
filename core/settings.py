@@ -45,7 +45,7 @@ import os
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Adicione esta linha
+        'DIRS': [os.path.join(BASE_DIR, 'compaz/templates')],  # Adicione o caminho do seu app
         #'DIRS': [BASE_DIR / 'templates'],  # Adicione o diretório de templates
         'APP_DIRS': True,
         'OPTIONS': {
@@ -71,7 +71,16 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'parceiros_db',
+#         'USER': 'postgres',
+#         'PASSWORD': '@Admin123',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -117,8 +126,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Redireciona para a página de criação de atendimento após o login
-LOGIN_REDIRECT_URL = '/compaz/criar/'
+
 
 # Modelo personalizado
 AUTH_USER_MODEL = 'compaz.CustomUsuario'
@@ -129,7 +137,9 @@ DATE_INPUT_FORMATS = [
     '%Y-%m-%d',  # Formato ISO (padrão do Django)
 ]
 
-LOGIN_REDIRECT_URL = 'criar_atendimento'
+# Redireciona para a página de criação de atendimento após o login
+LOGIN_REDIRECT_URL = '/compaz/listar/'
+
 LOGOUT_REDIRECT_URL = 'login'
 #LOGIN_URL = '/users/login'
 
@@ -146,3 +156,17 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # EMAIL_HOST_PASSWORD = 'sua-senha'
 # DEFAUTL_FROM_EMAIL = 'contato@fusion.com.br'
 # EMAIL_HOST_USER = 'no-reply@fusion.com.br'
+
+#Recursos extras de segurança do django
+# SECURE_HSTS_SECONDS = True
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+# SECURE_BROWSER_XSS_FILTER = True
+# SESSION_COOKIE_SECURE = False
+
+# CSRF_COOKIE_HTTPONLY = True
+# X_FRAME_OPTIONS = 'DENY'
+
+# SECURE_SSL_REDIRECT = False
+
+CSRF_COOKIE_SECURE = False

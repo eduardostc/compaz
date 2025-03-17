@@ -5,6 +5,10 @@ from model_bakery import baker  # model_mommy foi descontinuado
 from compaz.models import CustomUsuario, LocalServico, Area, Atendimento
 
 
+from django.test import TestCase
+from compaz.models import CustomUsuario
+
+
 class UsuarioManagerTestCase(TestCase):
 
     def test_create_user(self):
@@ -59,11 +63,8 @@ class ModelsTestCase(TestCase):
 
     def test_custom_usuario_str(self):
         """Testa o método __str__ do modelo CustomUsuario"""
-        expected_str = f"{self.usuario.first_name} {self.usuario.last_name}".strip()
-        if not expected_str:  # Caso first_name e last_name estejam vazios, usa o email
-            expected_str = self.usuario.email
-
-        self.assertEqual(str(self.usuario), expected_str)
+        #self.assertEqual(str(self.usuario), self.usuario.email)
+        self.assertEqual(str(self.usuario), f"{self.usuario.first_name} {self.usuario.last_name}".strip())
 
     def test_local_servico_str(self):
         """Testa o método __str__ do modelo LocalServico"""
@@ -77,3 +78,26 @@ class ModelsTestCase(TestCase):
         """Testa o método __str__ do modelo Atendimento"""
         expected_str = f"Atendimento {self.atendimento.id} - {self.atendimento.nome_cidadao}"
         self.assertEqual(str(self.atendimento), expected_str)
+
+
+
+
+
+
+
+
+
+
+# import uuid
+# from django.test import testcases
+# from model_mommy import mommy
+
+# from compaz.models import get_file_path
+
+# class ServicoTestCase(TestCase):
+    
+#     def setUp(self):
+#         self.servico = mommy.make('Servico')
+
+#     def test_str(self):
+#         self.assertEquals(str(self.servico), self.servico.servico)

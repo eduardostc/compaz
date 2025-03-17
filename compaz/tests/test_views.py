@@ -82,3 +82,23 @@ class AtendimentoViewsTest(TestCase):
 
         # Testa se o atendente aparece com o nome completo
         self.assertEqual(str(atendimento.atendente), "Test User")
+
+    def test_criar_atendimento_local_servico(self):
+        """Testa se o campo local_servico é preenchido corretamente com base no usuário logado."""
+        self.user.local_servico = self.local_servico
+        self.user.save()
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('criar_atendimento'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['form'].initial['local_servico'], self.local_servico)
+        self.assertTrue(response.context['form'].fields['local_servico'].disabled)
+
+    def test_criar_atendimento_area(self):
+        """Testa se o campo area é preenchido corretamente com base no usuário logado."""
+        self.user.area = self.area
+        self.user.save()
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('criar_atendimento'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['form'].initial['area'], self.area)
+        self.assertTrue(response.context['form'].fields['area'].disabled)

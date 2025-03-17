@@ -1,22 +1,197 @@
-<!-- atendimento/templates/atendimento/criar_atendimento.html -->
-{% if user.is_authenticated %}
-    <p>Bem-vindo, {{ user.first_name }} {{ user.last_name }}!</p>
-{% else %}
-    <p>Bem-vindo, visitante!</p>
-{% endif %}
+{% extends "base.html" %}
 
-<h1>Criar Atendimento</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Salvar</button>
-</form>
+{% block content %}
+<style>
+    /* Ajusta o estilo do Select2 para se integrar ao Bootstrap */
+    .select2-container .select2-selection--single {
+        height: 38px;
+        padding: 6px 12px;
+        font-size: 1rem;
+        line-height: 1.5;
+        border: 1px solid #ced4da !important;
+        border-radius: 0.25rem !important;
+    }
 
-<!-- Botão de logout -->
-<div style="margin-top: 20px;">
-    <a href="{% url 'logout' %}" style="text-decoration: none;">
-        <button type="button" style="padding: 10px 20px; background-color: #dc3545; color: white; border: none; cursor: pointer;">
-            Logout
-        </button>
-    </a>
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 36px;
+    }
+
+    .select2-dropdown {
+        border: 1px solid #ced4da !important;
+        border-radius: 0.25rem !important;
+    }
+
+    /* Ajusta o campo de busca dentro do dropdown */
+    .select2-container--default .select2-search--dropdown .select2-search__field {
+        border: 1px solid #ced4da !important;
+        border-radius: 0.25rem !important;
+        padding: 6px 12px;
+        font-size: 1rem;
+    }
+
+    /* Ajusta o foco do campo */
+    .select2-container--default.select2-container--focus .select2-selection--single {
+        border-color: #80bdff !important;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- Saudação do usuário -->
+    <div class="alert alert-primary text-center" role="alert">
+        {% if user.is_authenticated %}
+            <h5>Bem-vindo, {{ user.first_name }} {{ user.last_name }}!</h5>
+        {% else %}
+            <h5>Bem-vindo, visitante!</h5>
+        {% endif %}
+    </div>
+
+    <!-- Navegação em abas -->
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'lista_atendimentos' %}">Lista de Atendimentos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'criar_atendimento' %}">Cadastrar Atendimento</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'alterar_senha' %}">Alterar Senha</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a>
+        </li>
+    </ul>
+
+    <!-- Título -->
+    <h1 class="my-4 text-center">Cadastrar Atendimento</h1>
+
+    <!-- Formulário -->
+    <div class="card p-4 shadow-sm">
+        <form method="post">
+            {% csrf_token %}
+            
+            <!-- Linha para Atendente, Email e Turno -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_atendente">Nome do Atendente:</label>
+                        <input type="text" id="id_atendente" class="form-control" value="{{ user.get_full_name }}" readonly>
+                        <input type="hidden" name="atendente" value="{{ user.id }}">
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_email_atendente">Email do Atendente:</label>
+                        <input type="text" id="id_email_atendente" class="form-control" value="{{ user.email }}" readonly>
+                        <input type="hidden" name="email_atendente" value="{{ user.email }}">
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_turno">Turno:</label>
+                        <input type="text" id="id_turno" class="form-control" value="{{ form.initial.turno }}" readonly>
+                        <input type="hidden" name="turno" value="{{ form.initial.turno }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Linha para Data do Atendimento, Local do Serviço e Área -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_data_atendimento">Data do Atendimento:</label>
+                        <input type="date" id="id_data_atendimento" class="form-control" value="{{ form.initial.data_atendimento|date:'Y-m-d' }}" readonly>
+                        <input type="hidden" name="data_atendimento" value="{{ form.initial.data_atendimento|date:'Y-m-d' }}">
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_local_servico">Local do Serviço:</label>
+                        <input type="text" id="id_local_servico" class="form-control" value="{{ form.initial.local_servico }}" readonly>
+                        <input type="hidden" name="local_servico" value="{{ form.initial.local_servico.id }}">
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label for="id_area">Área:</label>
+                        <input type="text" id="id_area" class="form-control" value="{{ form.initial.area }}" readonly>
+                        <input type="hidden" name="area" value="{{ form.initial.area.id }}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outros campos do formulário -->
+            <div class="row">
+                <!-- Nome do Serviço -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label font-weight-bold">{{ form.nome_servico.label }}</label>
+                        {{ form.nome_servico }}
+                    </div>
+                </div>
+
+                <!-- Forma de Atendimento -->
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label font-weight-bold">{{ form.forma_atendimento.label }}</label>
+                        {{ form.forma_atendimento }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nome do Cidadão e Telefone do Cidadão -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label font-weight-bold">{{ form.nome_cidadao.label }}</label>
+                        {{ form.nome_cidadao }}
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="form-group">
+                        <label class="form-label font-weight-bold">{{ form.telefone_cidadao.label }}</label>
+                        {{ form.telefone_cidadao }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkbox do "problema_resolvido" e Botão -->
+            <div class="row align-items-center">
+                <!-- Checkbox -->
+                <div class="col-md-6 form-check mb-3">
+                    {{ form.problema_resolvido }}
+                    <label class="form-check-label font-weight-bold">{{ form.problema_resolvido.label }}</label>
+                </div>
+
+                <!-- Botão -->
+                <div class="col-md-6 text-end">
+                    <button type="submit" class="btn btn-success">Registrar</button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        // Inicializa o Select2 no campo "nome_servico"
+        $('#id_nome_servico').select2({
+            placeholder: "Selecione um serviço",
+            allowClear: true,
+            dropdownParent: $('#id_nome_servico').closest('.card'),
+            minimumResultsForSearch: 0 // Sempre exibe o campo de busca, independentemente do número de resultados
+        });
+    });
+</script>
+{% endblock %}
