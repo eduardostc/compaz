@@ -53,10 +53,16 @@
     <!-- Navegação em abas -->
     <ul class="nav nav-tabs">
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'lista_atendimentos' %}">Lista de Atendimentos</a>
+            <a class="nav-link" href="{% url 'meus_atendimentos' %}">Meus Atendimentos</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" href="{% url 'criar_atendimento' %}">Cadastrar Atendimento</a>
+            <a class="nav-link" href="{% url 'atendimentos_unidade' %}">{{ user.local_servico }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'atendimentos_geral' %}">Todos os Atendimentos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'novo_atendimento' %}">Cadastrar Novo Atendimento</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="{% url 'alterar_senha' %}">Alterar Senha</a>
@@ -67,19 +73,19 @@
     </ul>
 
     <!-- Título -->
-    <h1 class="my-4 text-center">Cadastrar Atendimento</h1>
+    <h2 class="my-4 text-center fw-bold text-primary">Cadastrar um Novo Atendimento</h2>
 
     <!-- Formulário -->
     <div class="card p-4 shadow-sm">
         <form method="post">
             {% csrf_token %}
             
-            <!-- Linha para Atendente, Email e Turno -->
+            <!-- Linha para Atendente, Email e Data do Atendimento -->
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="id_atendente">Nome do Atendente:</label>
-                        <input type="text" id="id_atendente" class="form-control" value="{{ user.get_full_name }}" readonly>
+                        <input type="text" id="id_atendente" class="form-control text-center" value="{{ user.get_full_name }}" readonly>
                         <input type="hidden" name="atendente" value="{{ user.id }}">
                     </div>
                 </div>
@@ -87,34 +93,35 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="id_email_atendente">Email do Atendente:</label>
-                        <input type="text" id="id_email_atendente" class="form-control" value="{{ user.email }}" readonly>
+                        <input type="text" id="id_email_atendente" class="form-control text-center" value="{{ user.email }}" readonly>
                         <input type="hidden" name="email_atendente" value="{{ user.email }}">
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="id_turno">Turno:</label>
-                        <input type="text" id="id_turno" class="form-control" value="{{ form.initial.turno }}" readonly>
-                        <input type="hidden" name="turno" value="{{ form.initial.turno }}">
+                        <label for="id_data_atendimento">Data do Atendimento:</label>
+                        <input type="date" id="id_data_atendimento" class="form-control text-center" value="{{ form.initial.data_atendimento|date:'Y-m-d' }}" readonly>
+                        <input type="hidden" name="data_atendimento" value="{{ form.initial.data_atendimento|date:'Y-m-d' }}">
                     </div>
                 </div>
             </div>
 
-            <!-- Linha para Data do Atendimento, Local do Serviço e Área -->
+
+            <!-- Linha para Horário do Atendimento, Local do Serviço e Área -->
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label for="id_data_atendimento">Data do Atendimento:</label>
-                        <input type="date" id="id_data_atendimento" class="form-control" value="{{ form.initial.data_atendimento|date:'Y-m-d' }}" readonly>
-                        <input type="hidden" name="data_atendimento" value="{{ form.initial.data_atendimento|date:'Y-m-d' }}">
+                        <label for="id_horario_atendimento">Horário do Atendimento:</label>
+                        <input type="text" id="id_horario_atendimento" class="form-control text-center" value="{{ form.initial.horario_atendimento }}" readonly>
+                        <input type="hidden" name="horario_atendimento" value="{{ form.initial.horario_atendimento }}">
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="id_local_servico">Local do Serviço:</label>
-                        <input type="text" id="id_local_servico" class="form-control" value="{{ form.initial.local_servico }}" readonly>
+                        <input type="text" id="id_local_servico" class="form-control text-center" value="{{ form.initial.local_servico }}" readonly>
                         <input type="hidden" name="local_servico" value="{{ form.initial.local_servico.id }}">
                     </div>
                 </div>
@@ -122,7 +129,7 @@
                 <div class="col-md-4">
                     <div class="form-group">
                         <label for="id_area">Área:</label>
-                        <input type="text" id="id_area" class="form-control" value="{{ form.initial.area }}" readonly>
+                        <input type="text" id="id_area" class="form-control text-center" value="{{ form.initial.area }}" readonly>
                         <input type="hidden" name="area" value="{{ form.initial.area.id }}">
                     </div>
                 </div>

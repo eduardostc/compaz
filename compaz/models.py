@@ -81,13 +81,10 @@ class Atendimento(models.Model):
     atendente = models.ForeignKey(CustomUsuario, on_delete=models.CASCADE)  # Alterado para CustomUsuario
     email_atendente = models.EmailField()
     data_atendimento = models.DateField(default=timezone.now)
-    TURNO_CHOICES = [
-        ('manha', 'Manhã'),
-        ('tarde', 'Tarde'),
-    ]
-    turno = models.CharField(max_length=5, choices=TURNO_CHOICES)
+    horario_atendimento = models.TimeField(default=timezone.now)  # Novo campo de horário
+
     local_servico = models.ForeignKey(LocalServico, on_delete=models.CASCADE)
-    area = models.ForeignKey(Area, on_delete=models.CASCADE)
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, null=True, blank=True)
     nome_servico = models.CharField(max_length=255)
     nome_cidadao = models.CharField(max_length=120)
     telefone_cidadao = models.CharField(max_length=15)

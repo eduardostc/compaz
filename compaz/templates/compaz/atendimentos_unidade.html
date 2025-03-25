@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <!-- Saudação do usuário -->
+    <div class="alert alert-primary text-center" role="alert">
+        {% if user.is_authenticated %}
+            <h5>Bem-vindo, {{ user.first_name }} {{ user.last_name }}!</h5>
+        {% else %}
+            <h5>Bem-vindo, visitante!</h5>
+        {% endif %}
+    </div>
+
+    <!-- Navegação em abas -->
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'meus_atendimentos' %}">Meus Atendimentos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="{% url 'atendimentos_unidade' %}">{{ user.local_servico }}</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'atendimentos_geral' %}">Todos os Atendimentos</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'novo_atendimento' %}">Cadastrar Novo Atendimento</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'alterar_senha' %}">Alterar Senha</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger" href="{% url 'logout' %}">Logout</a>
+        </li>
+    </ul>
+
+    <!-- Título -->
+    <h2 class="my-4 text-center fw-bold text-primary">{{ user.local_servico }}</h2>
+
+    <!-- Exibição por mês -->
+    {% for mes, atendimentos in atendimentos_por_mes.items %}
+    <h4 class="mt-4 mb-3 text-center bg-secondary text-white py-2 px-4 rounded-pill">{{ mes }}</h4>
+    {% comment %} <h3 class="mt-4">{{ mes }}</h3> {% endcomment %}
+
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Data</th>
+                        <th>Horário</th>
+                        <th>Atendente</th>
+                        <th>Área</th>      
+                        <th>Nome do Cidadão</th>
+                        <th>Telefone do Cidadão</th>
+                        <th>Serviço</th>
+                        <th>Forma do Atendimento</th>
+                        <th>Problema Resolvido</th>
+                        <th>Resolvido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for atendimento in atendimentos %}
+                        <tr>
+                            <td>{{ atendimento.data_atendimento }}</td>
+                            <td>{{ atendimento.horario_atendimento }}</td>
+                            <td>{{ atendimento.atendente }}</td>
+                            <td>{{ atendimento.area|default:"Sem área definida" }}</td>
+                            <td>{{ atendimento.nome_cidadao }}</td>
+                            <td>{{ atendimento.telefone_cidadao }}</td>
+                            <td>{{ atendimento.nome_servico }}</td>
+                            <td>{{ atendimento.forma_atendimento }}</td>
+                            <td>{{ atendimento.problema_resolvido }}</td>
+                            <td>{{ atendimento.problema_resolvido|yesno:"Sim,Não" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="10" class="text-center text-muted">Nenhum atendimento encontrado para este mês.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% empty %}
+        <p class="text-center text-muted">Nenhum atendimento encontrado para este local.</p>
+    {% endfor %}
+</div>
+
+{% endblock content %}

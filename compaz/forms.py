@@ -31,10 +31,17 @@ class AtendimentoForm(forms.ModelForm):
     class Meta:
         model = Atendimento
         fields = [
-            'atendente', 'email_atendente', 'data_atendimento', 'turno',
+            'atendente', 'email_atendente', 'data_atendimento', 'horario_atendimento',
             'local_servico', 'area', 'nome_servico', 'nome_cidadao',
             'telefone_cidadao', 'forma_atendimento', 'problema_resolvido',
         ]
+        labels = {
+            'nome_servico': 'Nome do Serviço',
+            'forma_atendimento': 'Forma de Atendimento',
+            'nome_cidadao': 'Nome do Cidadão',
+            'telefone_cidadao': 'Telefone do Cidadão',
+            'problema_resolvido': 'Problema Resolvido?',
+        }
         widgets = {
             'data_atendimento': forms.DateInput(
                 format='%Y-%m-%d',
@@ -45,6 +52,10 @@ class AtendimentoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super(AtendimentoForm, self).__init__(*args, **kwargs)
+
+        # Definir rótulos manualmente para os campos criados
+        self.fields['nome_servico'].label = "Nome do Serviço"
+        self.fields['forma_atendimento'].label = "Forma de Atendimento"
 
         #Isso garante que todos os campos do formulário herdem a classe de estilo básico para o Bootstrap.
         for field_name, field in self.fields.items():
@@ -78,12 +89,11 @@ class AtendimentoForm(forms.ModelForm):
                 self.initial['area'] = user.area
                 self.fields['area'].disabled = True
 
-        # Definir turno automaticamente
-        hora_atual = datetime.now().hour
-        self.initial['turno'] = 'manha' if 6 <= hora_atual < 12 else 'tarde'
-        # self.fields['turno'].widget.attrs['disabled'] = 'disabled'
-        # self.fields['turno'].widget.attrs['readonly'] = True  # Tornar o campo somente leitura
-        self.fields['turno'].widget = forms.HiddenInput()  # Usar um campo oculto para o turno
+
+        # Definir horario_atendimento automaticamente
+        self.initial['horario_atendimento'] = datetime.now().time().strftime('%H:%M')
+        self.fields['horario_atendimento'].widget.attrs['readonly'] = True  # Torna o campo somente leitura
+
 
         # Adiciona uma opção padrão ao campo nome_servico
         self.fields['nome_servico'].choices = [('', 'Selecione um serviço')]
@@ -123,3 +133,5 @@ class CustomUsuarioChangeForm(UserChangeForm):
     class Meta:
         model = CustomUsuario
         fields = ('first_name', 'last_name', 'fone')
+
+

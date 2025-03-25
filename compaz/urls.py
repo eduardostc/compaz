@@ -6,8 +6,11 @@ from .views import BuscarServicosView
 
 
 urlpatterns = [
-    path('criar/', views.criar_atendimento, name='criar_atendimento'),
-    path('listar/', views.lista_atendimentos, name='lista_atendimentos'),
+    path('novo-atendimento/', views.novo_atendimento, name='novo_atendimento'),
+    path('meus-atendimentos/', views.meus_atendimentos, name='meus_atendimentos'),
+
+    path('atendimentos-unidade/', views.atendimento_unidade, name='atendimentos_unidade'),
+    path('atendimentos-geral/', views.atendimento_geral, name='atendimentos_geral'),
 
     path('alterar_senha/', auth_views.PasswordChangeView.as_view(), name='alterar_senha'),
     path('alterar_senha/done/', auth_views.PasswordChangeDoneView.as_view(), name='alterar_senha_done'),

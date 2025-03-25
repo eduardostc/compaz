@@ -138,7 +138,7 @@ DATE_INPUT_FORMATS = [
 ]
 
 # Redireciona para a página de criação de atendimento após o login
-LOGIN_REDIRECT_URL = '/compaz/listar/'
+LOGIN_REDIRECT_URL = '/compaz/meus-atendimentos/'
 
 LOGOUT_REDIRECT_URL = 'login'
 #LOGIN_URL = '/users/login'
