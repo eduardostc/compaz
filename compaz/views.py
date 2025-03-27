@@ -5,7 +5,11 @@ from django.contrib.auth.decorators import login_required
 from .forms import AtendimentoForm
 from .models import Atendimento
 from django.contrib.auth import login
-
+#import para a funcionalidade do webhook
+import requests
+from django.contrib import messages
+from django.utils import timezone
+#imports responsável para aplicar o mes ao exibir os registro
 import locale
 from collections import defaultdict
 
@@ -59,7 +63,7 @@ def atendimento_unidade(request):
     return render(request, 'compaz/atendimentos_unidade.html', {'atendimentos_por_mes': dict(atendimentos_por_mes)})
 
 
-############################## OS METODOS ABAIXO ESTÃO FUNCIONANDO PORÉM SEM EXIBIR POR MÊS #######################################
+############################## OS METODOS ABAIXO ESTÃO FUNCIONANDO PORÉM SEM EXIBIR OS REGISTRO POR MÊS #######################################
 # @login_required
 # def meus_atendimentos(request):
 #     # atendimentos = Atendimento.objects.filter(atendente=request.user) #cada atendente só pode ver seus próprios atendimentos
@@ -86,30 +90,87 @@ def atendimento_unidade(request):
 
 #     return render(request, 'compaz/atendimentos_geral.html', {'atendimentos': atendimentos})
 
+################FIM###################
 
+# @login_required
+# def novo_atendimento(request):
+#     if request.method == 'POST':
+#         form = AtendimentoForm(request.POST, user=request.user)  # Passa o usuário logado
+#         if form.is_valid():
+#             form.save()
+#             return redirect('meus_atendimentos')
+#     else:
+#         form = AtendimentoForm(user=request.user)  # Passa o usuário logado
+#         # Define o valor inicial do campo local_servico com base no usuário logado
+#         if request.user.local_servico:
+#             form.fields['local_servico'].initial = request.user.local_servico
+#             form.fields['local_servico'].disabled = True  # Desabilita o campo se necessário
+
+#         # Define o valor inicial do campo area com base no usuário logado
+#         if request.user.area:
+#             form.fields['area'].initial = request.user.area
+#             form.fields['area'].disabled = True  # Desabilita o campo se necessário
+
+#     return render(request, 'compaz/novo_atendimento.html', {'form': form})
+
+
+WEBHOOK_URL = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook-test/compaz"
+                
 
 @login_required
 def novo_atendimento(request):
     if request.method == 'POST':
-        form = AtendimentoForm(request.POST, user=request.user)  # Passa o usuário logado
+        form = AtendimentoForm(request.POST, user=request.user)
         if form.is_valid():
-            form.save()
+            atendimento = form.save()
+            
+            # Prepara os dados para o webhook com os campos corretos
+            dados_webhook = {
+                'atendente': atendimento.atendente.get_full_name(),
+                'email_atendente': atendimento.email_atendente,
+                'data_atendimento': atendimento.data_atendimento.strftime('%Y-%m-%d'),
+                'horario_atendimento': atendimento.horario_atendimento.strftime('%H:%M:%S'),
+                'local_servico': str(atendimento.local_servico),
+                'area': str(atendimento.area) if atendimento.area else '',
+                'nome_servico': atendimento.nome_servico,
+                'nome_cidadao': atendimento.nome_cidadao,
+                'telefone_cidadao': atendimento.telefone_cidadao,
+                'forma_atendimento': atendimento.forma_atendimento,
+                'problema_resolvido': 'Sim' if atendimento.problema_resolvido else 'Não'
+            }
+            
+            try:
+                # print("Enviando dados para o webhook:", dados_webhook)  # Log para depuração
+                response = requests.post(
+                    WEBHOOK_URL,
+                    json=dados_webhook,
+                    headers={'Content-Type': 'application/json'},
+                    timeout=5
+                )
+                # print("Código de resposta do webhook:", response.status_code)
+                # print("Resposta do webhook:", response.text)
+                if response.status_code == 200:
+                    messages.success(request, 'Atendimento registrado e enviado com sucesso!')
+                else:
+                    messages.warning(request, 'Atendimento registrado, mas houve um problema ao enviar para o sistema')
+            except requests.exceptions.RequestException as e:
+                messages.warning(request, f'Atendimento registrado, mas o sistema de integração está indisponível: {str(e)}')
+            
             return redirect('meus_atendimentos')
     else:
-        form = AtendimentoForm(user=request.user)  # Passa o usuário logado
-        # Define o valor inicial do campo local_servico com base no usuário logado
+        form = AtendimentoForm(user=request.user)
         if request.user.local_servico:
             form.fields['local_servico'].initial = request.user.local_servico
-            form.fields['local_servico'].disabled = True  # Desabilita o campo se necessário
-
-        # Define o valor inicial do campo area com base no usuário logado
+            form.fields['local_servico'].disabled = True
         if request.user.area:
             form.fields['area'].initial = request.user.area
-            form.fields['area'].disabled = True  # Desabilita o campo se necessário
+            form.fields['area'].disabled = True
 
     return render(request, 'compaz/novo_atendimento.html', {'form': form})
 
 
+
+#imports responsável pela API dos campos serviços
 from django.http import JsonResponse
 from django.views import View
 

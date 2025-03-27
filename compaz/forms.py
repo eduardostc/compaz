@@ -57,6 +57,17 @@ class AtendimentoForm(forms.ModelForm):
         self.fields['nome_servico'].label = "Nome do Serviço"
         self.fields['forma_atendimento'].label = "Forma de Atendimento"
 
+        #widget para incluir a mascara
+        self.fields['telefone_cidadao'].widget.attrs.update({
+            'class': 'form-control mask-telefone',
+            'placeholder': '(00) 00000-0000'
+        })
+        # Adicionando placeholder para o campo Nome do Cidadão
+        self.fields['nome_cidadao'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Digite o nome completo do cidadão'
+        })
+
         #Isso garante que todos os campos do formulário herdem a classe de estilo básico para o Bootstrap.
         for field_name, field in self.fields.items():
             if field.widget.attrs.get('class') is None:  # Adiciona a classe apenas se ela não existir
