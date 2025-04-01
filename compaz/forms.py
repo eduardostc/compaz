@@ -28,6 +28,18 @@ class AtendimentoForm(forms.ModelForm):
         label="Área"
     )
 
+    # Alteração para exibir como radio buttons
+    PROBLEMA_RESOLVIDO_CHOICES = [
+        (True, 'Sim'),
+        (False, 'Não'),
+    ]
+
+    problema_resolvido = forms.ChoiceField(
+        choices=PROBLEMA_RESOLVIDO_CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'form-check-input'}),
+        initial=True  # Define "Sim" como a opção padrão
+    )
+
     class Meta:
         model = Atendimento
         fields = [
@@ -74,10 +86,10 @@ class AtendimentoForm(forms.ModelForm):
                 field.widget.attrs['class'] = 'form-control'
         
         # Adiciona classe específica ao checkbox do campo "problema_resolvido"
-        if 'problema_resolvido' in self.fields:
-            self.fields['problema_resolvido'].widget.attrs.update({'class': 'form-check-input'})
+        # if 'problema_resolvido' in self.fields:
+        #     self.fields['problema_resolvido'].widget.attrs.update({'class': 'form-check-input'})
 
-
+        # Se um usuário estiver logado, definir valores padrão
         if user:
             self.initial['atendente'] = user
             self.fields['atendente'].queryset = CustomUsuario.objects.filter(id=user.id)

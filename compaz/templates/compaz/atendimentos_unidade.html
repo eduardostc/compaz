@@ -54,7 +54,6 @@
                         <th>Telefone do Cidadão</th>
                         <th>Serviço</th>
                         <th>Forma do Atendimento</th>
-                        <th>Problema Resolvido</th>
                         <th>Resolvido</th>
                     </tr>
                 </thead>
@@ -69,7 +68,6 @@
                             <td>{{ atendimento.telefone_cidadao }}</td>
                             <td>{{ atendimento.nome_servico }}</td>
                             <td>{{ atendimento.forma_atendimento }}</td>
-                            <td>{{ atendimento.problema_resolvido }}</td>
                             <td>{{ atendimento.problema_resolvido|yesno:"Sim,Não" }}</td>
                         </tr>
                     {% empty %}

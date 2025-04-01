@@ -140,7 +140,7 @@
                 <!-- Nome do Serviço -->
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
-                        <label class="form-label font-weight-bold">{{ form.nome_servico.label }}:</label>
+                        <label class="form-label font-weight-bold">{{ form.nome_servico.label }}</label>
                         {{ form.nome_servico }}
                     </div>
                 </div>
@@ -148,7 +148,7 @@
                 <!-- Forma de Atendimento -->
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
-                        <label class="form-label font-weight-bold">{{ form.forma_atendimento.label }}:</label>
+                        <label class="form-label font-weight-bold">{{ form.forma_atendimento.label }}</label>
                         {{ form.forma_atendimento }}
                     </div>
                 </div>
@@ -158,43 +158,32 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
-                        <label class="form-label font-weight-bold">{{ form.nome_cidadao.label }}:</label>
+                        <label class="form-label font-weight-bold">{{ form.nome_cidadao.label }}</label>
                         {{ form.nome_cidadao }}
                     </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
                     <div class="form-group">
-                        <label class="form-label font-weight-bold">{{ form.telefone_cidadao.label }}:</label>
+                        <label class="form-label font-weight-bold">{{ form.telefone_cidadao.label }}</label>
                         {{ form.telefone_cidadao }}
                     </div>
                 </div>
             </div>
 
             <!-- Checkbox do "problema_resolvido" e Botão -->
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group text-center">
-                        <label class="form-label font-weight-bold d-block">Problema Resolvido?</label>
-                        <div class="d-flex justify-content-center">
-                            <div class="form-check" style="margin-right: 20px;"> 
-                                <input class="form-check-input" type="radio" name="problema_resolvido" id="id_problema_sim" value="True" checked>
-                                <label class="form-check-label" for="id_problema_sim">Sim</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="problema_resolvido" id="id_problema_nao" value="False">
-                                <label class="form-check-label" for="id_problema_nao">Não</label>
-                            </div>
-                        </div>
-                    </div>
+            <div class="row align-items-center">
+                <!-- Checkbox -->
+                <div class="col-md-6 form-check mb-3">
+                    {{ form.problema_resolvido }}
+                    <label class="form-check-label font-weight-bold">{{ form.problema_resolvido.label }}</label>
                 </div>
+
                 <!-- Botão -->
                 <div class="col-md-6 text-end">
                     <button type="submit" class="btn btn-success">Registrar</button>
                 </div>
             </div>
-
-            
         </form>
     </div>
 </div>
