@@ -52,7 +52,10 @@ class AtendimentoForm(forms.ModelForm):
             'forma_atendimento': 'Forma de Atendimento',
             'nome_cidadao': 'Nome do Cidadão',
             'telefone_cidadao': 'Telefone do Cidadão',
-            'problema_resolvido': 'Problema Resolvido?',
+            'problema_resolvido': 'O Problema foi resolvido?',
+            'email_atendente': 'Email',
+            'data_atendimento': 'Data',
+            'horario_atendimento': 'Horário',
         }
         widgets = {
             'data_atendimento': forms.DateInput(
@@ -107,15 +110,21 @@ class AtendimentoForm(forms.ModelForm):
                 self.initial['local_servico'] = user.local_servico
                 self.fields['local_servico'].disabled = True
 
-            # Define o valor inicial do campo area com base no usuário logado
+            # Define o valor inicial do campo area e garante que ele fique desabilitado
+            self.fields['area'].disabled = True
+            self.fields['area'].widget.attrs['disabled'] = 'disabled'
+
+            # Define o valor inicial apenas se user.area estiver definido
             if user.area:
                 self.initial['area'] = user.area
-                self.fields['area'].disabled = True
+
 
 
         # Definir horario_atendimento automaticamente
         self.initial['horario_atendimento'] = datetime.now().time().strftime('%H:%M')
         self.fields['horario_atendimento'].widget.attrs['readonly'] = True  # Torna o campo somente leitura
+        # self.fields['horario_atendimento'].widget.attrs['disabled'] = 'disabled'
+
 
 
         # Adiciona uma opção padrão ao campo nome_servico

@@ -1,7 +1,33 @@
 {% extends "base.html" %}
+{% load django_bootstrap5 %}
 
 {% block content %}
+
 <style>
+    
+    /*Aplicando estilo no campo horario */
+    input[readonly] {
+        background-color: #e9ecef; /* Cinza claro */
+        color: #495057; /* Texto escuro */
+        /*font-weight: bold; /* Texto em negrito */
+        border-color: #ced4da; /* Mantém o estilo do campo */
+    }
+
+    
+    /* Remove a seta do select quando o campo estiver desabilitado */
+    select:disabled {
+        appearance: none; /* Remove o estilo padrão do select */
+        -webkit-appearance: none; /* Compatibilidade com navegadores baseados em WebKit */
+        -moz-appearance: none; /* Compatibilidade com navegadores baseados em Gecko */
+        background-image: none; /* Remove qualquer ícone de seta */
+    }
+
+    /* Define o texto das labels em negrito */
+    label {
+        font-weight: bold; 
+    }
+    
+
     /* Ajusta o estilo do Select2 para se integrar ao Bootstrap */
     .select2-container .select2-selection--single {
         height: 38px;
@@ -39,10 +65,9 @@
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
     }
 </style>
-
 <div class="container-fluid mt-4 px-4">
     <!-- Saudação do usuário -->
-    <div class="alert alert-primary text-center" role="alert">
+    <div class="alert alert-primary text-center">
         {% if user.is_authenticated %}
             <h5>Bem-vindo, {{ user.first_name }} {{ user.last_name }}!</h5>
         {% else %}
@@ -72,128 +97,79 @@
         </li>
     </ul>
 
-    <!-- Título -->
     <h2 class="my-4 text-center fw-bold text-primary">Cadastrar um Novo Atendimento</h2>
 
-    <!-- Formulário -->
     <div class="card p-4 shadow-sm">
         <form method="post">
             {% csrf_token %}
             
-            <!-- Linha para Atendente, Email e Data do Atendimento -->
             <div class="row">
+                
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="id_atendente">Nome do Atendente:</label>
-                        <input type="text" id="id_atendente" class="form-control text-center" value="{{ user.get_full_name }}" readonly>
-                        <input type="hidden" name="atendente" value="{{ user.id }}">
-                    </div>
+                    {% bootstrap_field form.atendente %}
                 </div>
 
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="id_email_atendente">Email do Atendente:</label>
-                        <input type="text" id="id_email_atendente" class="form-control text-center" value="{{ user.email }}" readonly>
-                        <input type="hidden" name="email_atendente" value="{{ user.email }}">
-                    </div>
+                    {% bootstrap_field form.email_atendente %}
                 </div>
-
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="id_data_atendimento">Data do Atendimento:</label>
-                        <input type="date" id="id_data_atendimento" class="form-control text-center" value="{{ form.initial.data_atendimento|date:'Y-m-d' }}" readonly>
-                        <input type="hidden" name="data_atendimento" value="{{ form.initial.data_atendimento|date:'Y-m-d' }}">
-                    </div>
+                    {% bootstrap_field form.data_atendimento %}
                 </div>
             </div>
 
-
-            <!-- Linha para Horário do Atendimento, Local do Serviço e Área -->
             <div class="row">
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="id_horario_atendimento">Horário do Atendimento:</label>
-                        <input type="text" id="id_horario_atendimento" class="form-control text-center" value="{{ form.initial.horario_atendimento }}" readonly>
-                        <input type="hidden" name="horario_atendimento" value="{{ form.initial.horario_atendimento }}">
-                    </div>
+                    {% bootstrap_field form.horario_atendimento %}
                 </div>
-
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="id_local_servico">Local do Serviço:</label>
-                        <input type="text" id="id_local_servico" class="form-control text-center" value="{{ form.initial.local_servico }}" readonly>
-                        <input type="hidden" name="local_servico" value="{{ form.initial.local_servico.id }}">
-                    </div>
+                    {% bootstrap_field form.local_servico %}
                 </div>
-
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label for="id_area">Área:</label>
-                        <input type="text" id="id_area" class="form-control text-center" value="{{ form.initial.area }}" readonly>
-                        <input type="hidden" name="area" value="{{ form.initial.area.id }}">
-                    </div>
+                    {% bootstrap_field form.area disabled="disabled"%}
+                </div>
+            </div>         
+
+            <div class="row">
+                <div class="col-md-6">
+                    {% bootstrap_field form.nome_servico %}
+                </div>
+                <div class="col-md-6">
+                    {% bootstrap_field form.forma_atendimento %}
                 </div>
             </div>
 
-            <!-- Outros campos do formulário -->
             <div class="row">
-                <!-- Nome do Serviço -->
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label class="form-label font-weight-bold">{{ form.nome_servico.label }}:</label>
-                        {{ form.nome_servico }}
-                    </div>
+                <div class="col-md-6">
+                    {% bootstrap_field form.nome_cidadao %}
                 </div>
-
-                <!-- Forma de Atendimento -->
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label class="form-label font-weight-bold">{{ form.forma_atendimento.label }}:</label>
-                        {{ form.forma_atendimento }}
-                    </div>
+                <div class="col-md-6">
+                    {% bootstrap_field form.telefone_cidadao %}
                 </div>
             </div>
 
-            <!-- Nome do Cidadão e Telefone do Cidadão -->
             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label class="form-label font-weight-bold">{{ form.nome_cidadao.label }}:</label>
-                        {{ form.nome_cidadao }}
-                    </div>
-                </div>
-
-                <div class="col-md-6 mb-3">
-                    <div class="form-group">
-                        <label class="form-label font-weight-bold">{{ form.telefone_cidadao.label }}:</label>
-                        {{ form.telefone_cidadao }}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Checkbox do "problema_resolvido" e Botão -->
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <div class="form-group text-center">
-                        <label class="form-label font-weight-bold d-block">Problema Resolvido?</label>
-                        <div class="d-flex justify-content-center">
-                            <div class="form-check" style="margin-right: 20px;"> 
-                                <input class="form-check-input" type="radio" name="problema_resolvido" id="id_problema_sim" value="True" checked>
-                                <label class="form-check-label" for="id_problema_sim">Sim</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="problema_resolvido" id="id_problema_nao" value="False">
-                                <label class="form-check-label" for="id_problema_nao">Não</label>
-                            </div>
+                {% comment %} <div class="col-md-6 text-center"> {% endcomment %}
+                    <label class="form-label fw-bold d-block">O Problema foi resolvido?</label>
+                    <div class="d-flex justify-content-center">
+                        <div class="form-check me-3">
+                            <input class="form-check-input" type="radio" name="problema_resolvido" id="id_problema_sim" value="True" checked>
+                            <label class="form-check-label" for="id_problema_sim" style="font-weight: normal;">Sim</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="problema_resolvido" id="id_problema_nao" value="False">
+                            <label class="form-check-label" for="id_problema_nao" style="font-weight: normal;">Não</label>
                         </div>
                     </div>
-                </div>
-                <!-- Botão -->
-                <div class="col-md-6 text-end">
-                    <button type="submit" class="btn btn-success">Registrar</button>
-                </div>
+                {% comment %} </div> {% endcomment %}
+                
+                 {% comment %} <div class="col-md-6 text-end">
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                </div>  {% endcomment %}
             </div>
-
+            <br />
+            <div class="row">
+                <button type="submit" class="btn btn-success ">Salvar</button>
+            </div> 
             
         </form>
     </div>
@@ -213,3 +189,4 @@
     });
 </script>
 {% endblock %}
+

@@ -14,9 +14,8 @@ urlpatterns = [
 
     path('alterar_senha/', auth_views.PasswordChangeView.as_view(), name='alterar_senha'),
     path('alterar_senha/done/', auth_views.PasswordChangeDoneView.as_view(), name='alterar_senha_done'),
-    # path("alterar-senha/", auth_views.PasswordChangeView.as_view(template_name="registration/password_change_form.html"), name="alterar_senha"),
-    # path("senha-alterada/", auth_views.PasswordChangeDoneView.as_view(template_name="registration/password_change_done.html"), name="password_change_done"),
-    # path('buscar-servicos/', BuscarServicosView.as_view(), name='buscar_servicos'),
+
+    
 ]
 
 # https://www.youtube.com/watch?v=-ZK5eCyJIWo

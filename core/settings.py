@@ -27,6 +27,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'compaz',
+
+    'django_bootstrap5',
+    'chartjs', #app para geração dos graficos.
 ]
 
 MIDDLEWARE = [
