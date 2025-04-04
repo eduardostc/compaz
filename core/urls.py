@@ -14,13 +14,10 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
 
-    # Redirecionamento para login ao acessar a raiz do site
-    path('', RedirectView.as_view(url='/login/')),
-
-    # Inclui as URLs da aplicação compaz
-    path('compaz/', include('compaz.urls')),
-    
+    # Inclui as URLs da aplicação compaz diretamente na raiz
+    path('', include('compaz.urls')),  # Isso delega a lógica da URL raiz para o urls.py da aplicação
 ]
+
 
 # Personalização do painel administrativo
 admin.site.site_header = 'Espaço Conecta'

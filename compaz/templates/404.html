@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}Página Não Encontrada{% endblock %}
+
+{% block content %}
+<style>
+    .error-container {
+        margin-top: 5rem;
+    }
+
+    .error-title {
+        font-size: 6rem;
+        color: #dc3545; /* Vermelho */
+        font-weight: bold;
+    }
+
+    .error-message {
+        font-size: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .btn-container {
+        margin-top: 2rem;
+    }
+</style>
+
+<div class="container-fluid text-center error-container">
+    <h1 class="error-title">404</h1>
+    <p class="error-message">Ops! A página que você está procurando não foi encontrada.</p>
+    <p>Verifique o endereço ou clique no botão abaixo para retornar à página inicial.</p>
+    <div class="btn-container">
+        <a href="{% url 'meus_atendimentos' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-home"></i> Voltar para a Página Inicial
+        </a>
+    </div>
+</div>
+{% endblock %}

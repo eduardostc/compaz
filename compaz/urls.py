@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, reverse_lazy
 from . import views
 from django.contrib.auth import views as auth_views
 
@@ -6,16 +6,23 @@ from .views import BuscarServicosView
 
 
 urlpatterns = [
+    # URL raiz redireciona para "Meus Atendimentos"
+    path('', views.redirecionar_meus_atendimentos, name='raiz'),
+
     path('novo-atendimento/', views.novo_atendimento, name='novo_atendimento'),
     path('meus-atendimentos/', views.meus_atendimentos, name='meus_atendimentos'),
-
     path('atendimentos-unidade/', views.atendimento_unidade, name='atendimentos_unidade'),
     path('atendimentos-geral/', views.atendimento_geral, name='atendimentos_geral'),
 
-    path('alterar_senha/', auth_views.PasswordChangeView.as_view(), name='alterar_senha'),
-    path('alterar_senha/done/', auth_views.PasswordChangeDoneView.as_view(), name='alterar_senha_done'),
+   # Alteração de senha
+    path('alterar_senha/', auth_views.PasswordChangeView.as_view(
+        template_name='registration/password_change_form.html',
+        success_url=reverse_lazy('alterar_senha_done')  # Redireciona para o nome da URL
+    ), name='alterar_senha'),
 
-    
+    path('alterar_senha/done/', auth_views.PasswordChangeDoneView.as_view(
+        template_name='registration/password_change_done.html'
+    ), name='alterar_senha_done'),
 ]
 
 # https://www.youtube.com/watch?v=-ZK5eCyJIWo

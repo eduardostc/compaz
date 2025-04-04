@@ -191,3 +191,10 @@ class BuscarServicosView(View):
         servicos = [servico for servico in servicos_disponiveis if termo.lower() in servico.lower()]
 
         return JsonResponse(servicos, safe=False)
+    
+
+@login_required
+def redirecionar_meus_atendimentos(request):
+    # Redireciona para a página "Meus Atendimentos" se autenticado
+    return redirect('meus_atendimentos')
+

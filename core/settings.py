@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-erzsl2wgc=yq$b0q9z3t6a5&#=!r)y4f(nh%))%%u#+j2aoy^t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -142,10 +142,11 @@ DATE_INPUT_FORMATS = [
 ]
 
 # Redireciona para a página de criação de atendimento após o login
-LOGIN_REDIRECT_URL = '/compaz/meus-atendimentos/'
+# Configuração correta no settings.py
+LOGIN_REDIRECT_URL = '/meus-atendimentos/'  # Após login, redireciona para "Meus Atendimentos"
+LOGOUT_REDIRECT_URL = '/login/'  # Ou para qualquer outra página de sua escolha
+LOGIN_URL = '/login/'  # URL que será usada para redirecionar usuários não autenticados
 
-LOGOUT_REDIRECT_URL = 'login'
-#LOGIN_URL = '/users/login'
 
 # Configurações de e-mail (para testes)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
