@@ -13,12 +13,29 @@
         border-radius: 0.25rem !important;
     }
 
-    /* Aplicando estilo no campo horario */
+    {% comment %} /* Aplicando estilo no campo horario */
     input[readonly] {
         background-color: #e9ecef; /* Cinza claro */
         color: #495057; /* Texto escuro */
         border-color: #ced4da; /* Mantém o estilo do campo */
+    } {% endcomment %}
+    
+    /* Aplicando estilo para campos readonly */
+    input[readonly] {
+        background-color: #e9ecef; /* Cinza claro */
+        color: #495057; /* Texto escuro */
+        border-color: #ced4da; /* Mantém o estilo do campo */
+        cursor: default; /* Indica que o campo não é interativo */
     }
+
+    /* Prevenindo mudanças de estilo ao focar no campo */
+    input[readonly]:focus {
+        background-color: #e9ecef; /* Mantém a mesma cor de fundo */
+        border-color: #ced4da; /* Mantém o estilo da borda */
+        outline: none; /* Remove o contorno azul padrão */
+        box-shadow: none; /* Remove quaisquer sombras de foco */
+    }
+
 
     /* Ajusta o texto das labels para negrito */
     label {
@@ -67,12 +84,17 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'alterar_senha' %}active{% endif %}" href="{% url 'alterar_senha' %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'relatorio' %}active{% endif %} text-success fw-bold" href="{% url 'relatorio' %}">
+                <i class="fas fa-file-pdf"></i> Relatório
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'alterar_senha' %}active{% endif %} text-warning fw-bold" href="{% url 'alterar_senha' %}">
                 <i class="fas fa-key"></i> Alterar Senha
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-danger {% if request.resolver_match.url_name == 'logout' %}active{% endif %}" href="{% url 'logout' %}">
+            <a class="nav-link text-danger fw-bold {% if request.resolver_match.url_name == 'logout' %}active{% endif %}" href="{% url 'logout' %}">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </li>

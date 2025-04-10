@@ -38,15 +38,21 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'alterar_senha' %}active{% endif %}" href="{% url 'alterar_senha' %}">
+            <a class="nav-link {% if request.resolver_match.url_name == 'relatorio' %}active{% endif %} text-success fw-bold" href="{% url 'relatorio' %}">
+                <i class="fas fa-file-pdf"></i> Relatório
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'alterar_senha' %}active{% endif %} text-warning fw-bold" href="{% url 'alterar_senha' %}">
                 <i class="fas fa-key"></i> Alterar Senha
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-danger {% if request.resolver_match.url_name == 'logout' %}active{% endif %}" href="{% url 'logout' %}">
+            <a class="nav-link text-danger fw-bold {% if request.resolver_match.url_name == 'logout' %}active{% endif %}" href="{% url 'logout' %}">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </li>
+        
     </ul>
 
     <!-- Título principal -->

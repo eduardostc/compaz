@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container-fluid mt-4 px-4">
+    <!-- Saudação do usuário -->
+    <div class="alert alert-primary text-center" role="alert">
+        {% if user.is_authenticated %}
+            <h5>Bem-vindo, {{ user.first_name }} {{ user.last_name }}!</h5>
+        {% else %}
+            <h5>Bem-vindo, visitante!</h5>
+        {% endif %}
+    </div>
+
+    <!-- Navegação superior -->
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h2 class="text-primary fw-bold"></h2>
+        <!-- Botão destacado para realizar registro -->
+        <a href="{% url 'relatorio' %}?download=true&ano={{ ano_selecionado }}" class="btn btn-danger btn-lg" target="_blank">
+            <i class="fas fa-file-pdf"></i> Gerar PDF
+        </a>        
+    </div>
+
+    <!-- Abas de navegação -->
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'meus_atendimentos' %}active{% endif %}" href="{% url 'meus_atendimentos' %}">
+                <i class="fas fa-user"></i> Meus Atendimentos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'atendimentos_unidade' %}active{% endif %}" href="{% url 'atendimentos_unidade' %}">
+                <i class="fas fa-building"></i> {{ user.local_servico }}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'atendimentos_geral' %}active{% endif %}" href="{% url 'atendimentos_geral' %}">
+                <i class="fas fa-globe"></i> Todos os Atendimentos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'relatorio' %}active{% endif %} text-success fw-bold" href="{% url 'relatorio' %}">
+                <i class="fas fa-file-pdf"></i> Relatório
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'alterar_senha' %}active{% endif %} text-warning fw-bold" href="{% url 'alterar_senha' %}">
+                <i class="fas fa-key"></i> Alterar Senha
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger fw-bold {% if request.resolver_match.url_name == 'logout' %}active{% endif %}" href="{% url 'logout' %}">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </li>
+    </ul>
+
+    <!-- Seletor de Ano - Agora acima do título -->
+    <div class="text-center mb-3">
+        <form method="GET" class="d-inline-flex align-items-center">
+            <label class="fw-bold me-2">Selecionar Ano:</label>
+            <select name="ano" class="form-select me-2" onchange="this.form.submit()">
+                {% for ano in anos_disponiveis %}
+                <option value="{{ ano.year }}" {% if ano.year == ano_selecionado|add:0 %}selected{% endif %}>{{ ano.year }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- Título do relatório -->
+    <h3 class="text-center text-primary fw-bold mb-4">Relatório do Espaço Conecta do Ano - {{ ano_selecionado }}</h3>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="thead-dark bg-primary text-white">
+                <tr>
+                    <th class="text-center">Local do Serviço</th>
+                    {% for mes in meses_nomes %}
+                    <th class="text-center">{{ mes }}</th>
+                    {% endfor %}
+                    <th class="text-center">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for local, meses in atendimentos_por_local.items %}
+                <tr>
+                    <td class="fw-bold text-center">{{ local }}</td>
+                    {% for mes in meses_nomes %}
+                    <td class="text-center">{{ meses|get_item:mes|default:0 }}</td>
+                    {% endfor %}
+                    <td class="fw-bold text-center">{{ meses.Total }}</td>
+                </tr>
+                {% endfor %}
+
+                <!-- Linha de somatório -->
+                <tr class="bg-light">
+                    <td class="fw-bold text-center">Total</td>
+                    {% for mes in meses_nomes %}
+                    <td class="fw-bold text-center">
+                        {{ atendimentos_por_local|sum_column:mes }}
+                    </td>
+                    {% endfor %}
+                    <td class="fw-bold text-center">
+                        {{ atendimentos_por_local|sum_total }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    {% if atendimentos_por_local %}
+    {% else %}
+        <p class="text-center text-muted">Nenhum atendimento encontrado para exibir no relatório.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
+
+
+{% comment %} {% extends "base.html" %}
+{% load custom_filters %}  <!-- Carregando filtro personalizado -->
+
+{% block content %}
+<div class="container-fluid mt-4 px-4">
+    <div class="alert alert-primary text-center" role="alert">
+        {% if user.is_authenticated %}
+            <h5>Bem-vindo, {{ user.first_name }} {{ user.last_name }}!</h5>
+        {% else %}
+            <h5>Bem-vindo, visitante!</h5>
+        {% endif %}
+    </div>
+
+    <!-- Navegação superior -->
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h2 class="text-primary fw-bold"></h2>
+        <!-- Botão destacado para realizar registro -->
+        <a href="{% url 'relatorio' %}?download=true" class="btn btn-danger btn-lg">
+            <i class="fas fa-file-pdf"></i> Baixar PDF
+        </a>
+    </div>
+
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'meus_atendimentos' %}active{% endif %}" href="{% url 'meus_atendimentos' %}">
+                <i class="fas fa-user"></i> Meus Atendimentos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'atendimentos_unidade' %}active{% endif %}" href="{% url 'atendimentos_unidade' %}">
+                <i class="fas fa-building"></i> {{ user.local_servico }}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'atendimentos_geral' %}active{% endif %}" href="{% url 'atendimentos_geral' %}">
+                <i class="fas fa-globe"></i> Todos os Atendimentos
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'relatorio' %}active{% endif %} text-success fw-bold" href="{% url 'relatorio' %}">
+                <i class="fas fa-file-pdf"></i> Relatório
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.resolver_match.url_name == 'alterar_senha' %}active{% endif %} text-warning fw-bold" href="{% url 'alterar_senha' %}">
+                <i class="fas fa-key"></i> Alterar Senha
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-danger fw-bold {% if request.resolver_match.url_name == 'logout' %}active{% endif %}" href="{% url 'logout' %}">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </li>
+    </ul>
+
+    <h3 class="text-center text-primary fw-bold mb-4">Relatório do 2025</h3>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered align-middle">
+            <thead class="thead-dark bg-primary text-white">
+                <tr>
+                    <th class="text-center">Local do Serviço</th>
+                    {% for mes in meses_nomes %}
+                    <th class="text-center">{{ mes }}</th>
+                    {% endfor %}
+                    <th class="text-center">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for local, meses in atendimentos_por_local.items %}
+                <tr>
+                    <td class="fw-bold text-center">{{ local }}</td>
+                    {% for mes in meses_nomes %}
+                    <td class="text-center">{{ meses|get_item:mes|default:0 }}</td>
+                    {% endfor %}
+                    <td class="fw-bold text-center">{{ meses.Total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if atendimentos_por_local %}
+    {% else %}
+        <p class="text-center text-muted">Nenhum atendimento encontrado para exibir no relatório.</p>
+    {% endif %}
+</div>
+{% endblock %}
+ {% endcomment %}
+
