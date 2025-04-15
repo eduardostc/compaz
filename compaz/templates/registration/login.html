@@ -71,6 +71,16 @@
                         </a>
                     </div>
                 </form>
+                {% comment %} {% if messages %}
+                    <div class="alert alert-info">
+                        <ul>
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %} {% endcomment %}
+
             </div>
             
             <p class="text-center text-muted small mt-3">
@@ -92,13 +102,7 @@
                 <p>Para solicitar acesso ou reinicialização de senha, entre em contato com:</p>
                 <ul class="list-unstyled">
                     <li class="mb-2">
-                        <i class="bi bi-envelope-fill me-2 text-success"></i>ciceramaria@recife.pe.gov.br
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-envelope-fill me-2 text-success"></i>joaocarloscosta@recife.pe.gov.br
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-envelope-fill me-2 text-success"></i>carlos.rodrigues@recife.pe.gov.br
+                        <i class="bi bi-envelope-fill me-2 text-success"></i>O setor de Marketing Digital da Emprel
                     </li>
                 </ul>
             </div>
@@ -115,125 +119,3 @@
 {% endblock %}
 
 
-
-
-
-
-
-{% comment %} {% extends "base.html" %}
-{% load static %}
-{% load django_bootstrap5 %}
-
-{% block content %}
-<style>
-    .login-container {
-        max-width: 700px;
-        margin: 0 auto;
-        padding-top: 5.5rem !important; /* Espaçamento superior mínimo possível */
-    }
-    
-    
-    .login-card {
-        padding: 0.5rem 5rem !important; /* Padding vertical extremamente reduzido */
-        margin: 0.25rem 15px !important; /* Margens mínimas */
-    }    
-    
-    /* Logo */
-    .login-logo {
-        width: 300px; /* Reduzi um pouco o logo */
-        height: 60px;
-        margin: 0 auto 1rem; /* Reduzi a margem inferior */
-    }
-    
-    .form-group {
-        margin-bottom: 0.5rem !important; /* Espaço mínimo entre campos */
-    }
-    
-    .btn-primary {
-        padding: 0.35rem 0.75rem !important; /* Botão ultracompacto */
-        margin-bottom: 0.5rem !important;
-    }
-    
-    .support-contact {
-        padding: 0.4rem !important; /* Padding interno mínimo */
-        margin-top: 0.5rem !important; /* Espaço acima reduzido */
-        font-size: 0.85rem !important; /* Fonte ligeiramente menor */
-    }
-    
-    .login-footer {
-        margin-top: 0.25rem !important; /* Espaçamento mínimo do footer */
-    }
-
-
-    
-</style>
-
-<div class="container-fluid mt-4 px-4">
-    <div class="login-container">
-        <div class="card login-card">
-            <div class="text-center mb-4">
-                <img src="{% static 'images/logoEspacoConecta.jpeg' %}" alt="Logo Espaço Conecta" class="login-logo">
-                <h2 class="fw-bold text-primary">Sistema de Gerenciamento do Espaço Conecta</h2>
-            </div>
-
-            <form method="post" class="form-signin" autocomplete="off">
-                {% csrf_token %}
-                
-                <div class="mb-3">
-                    {% bootstrap_field form.username label_class="form-label" %}
-                </div>
-                
-                <div class="mb-3">
-                    {% bootstrap_field form.password label_class="form-label" %}
-                </div>
-                
-                <button class="btn btn-primary w-100 py-2 mb-3" type="submit">
-                    Acessar
-                </button>
-                
-
-<div class="text-center mt-3">
-    <a href="#" class="text-decoration-none" data-bs-toggle="modal" data-bs-target="#contatoModal">
-        <small>Suporte</small>
-    </a>
-</div>
-
-<div class="border-top border-success pt-2 mt-3">
-    <p class="mt-2 mb-0 text-success text-center">
-        Espaço Conecta &copy; {% now 'Y' %}
-    </p>
-</div>
-
-<!-- Modal de Contatos -->
-<div class="modal fade" id="contatoModal" tabindex="-1" aria-labelledby="contatoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-success" id="contatoModalLabel">Contatos</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Para solicitar acesso ou reinicialização de senha, entre em contato com:</p>
-                <ul class="list-unstyled">
-                    <li class="mb-2">
-                        <i class="bi bi-envelope-fill me-2 text-success"></i>ciceramaria@recife.pe.gov.br
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-envelope-fill me-2 text-success"></i>joaocarloscosta@recife.pe.gov.br
-                    </li>
-                    <li class="mb-2">
-                        <i class="bi bi-envelope-fill me-2 text-success"></i>carlos.rodrigues@recife.pe.gov.br
-                    </li>
-                </ul>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success btn-sm" data-bs-dismiss="modal">Fechar</button>
-            </div>
-        </div>
-    </div>
-</div>
-            </form>
-        </div>
-    </div>
-</div>
-{% endblock %} {% endcomment %}

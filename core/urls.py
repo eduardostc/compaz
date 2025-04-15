@@ -5,7 +5,7 @@ from django.views.generic.base import RedirectView  # Para redirecionamentos
 from compaz import views  # Suas views personalizadas
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('painel/', admin.site.urls),
 
     # URLs de autenticação do Django (login, logout, mudança de senha etc.)
     path('', include('django.contrib.auth.urls')),

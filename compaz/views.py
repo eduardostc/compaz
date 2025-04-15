@@ -1,40 +1,45 @@
 # compaz/views.py
 
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from .forms import AtendimentoForm
 from .models import Atendimento
-from django.contrib.auth import login
 #import para a funcionalidade do webhook
 import requests
 from django.contrib import messages
-from django.utils import timezone
 #imports responsável para aplicar o mes ao exibir os registro
 import locale
 from collections import defaultdict
 
 #imports responsável para geracao do relatorio pdf.
-from django.shortcuts import render
 from django.views import View
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponseForbidden
 from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 import io
 from datetime import datetime
-from .models import Atendimento
 
 from reportlab.platypus import Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
+from django.contrib.auth.models import Group
+
 
 class RelatorioView(View):
     def get(self, request, *args, **kwargs):
+        # Verificar se o usuário pertence ao grupo "Gestores de Relatórios"
+        is_gestor = request.user.groups.filter(name="Gestores de Relatórios").exists()
+        #print("is_gestor:", is_gestor)  # Testa o valor no console
+
+        if not is_gestor:
+            return redirect('access_denied')  # Redireciona para uma página de acesso negado
+
         # Obtém o ano do parâmetro GET, padrão para o ano atual
         ano = request.GET.get("ano", datetime.now().year)
 
         # Verifica se o usuário quer baixar o PDF
         if "download" in request.GET:
-            return self.gerar_pdf(ano) # Passa o ano para o método gerar_pdf
+            return self.gerar_pdf(ano)  # Passa o ano para o método gerar_pdf
 
         # Obtém os registros de Atendimento filtrando pelo ano
         atendimentos = Atendimento.objects.filter(data_atendimento__year=ano)
@@ -59,18 +64,32 @@ class RelatorioView(View):
         for local, meses_totais in atendimentos_por_local.items():
             meses_totais["Total"] = sum(meses_totais.values())
 
-        # Prepara o contexto para o template
+        # Criando a segunda tabela (dados por ano)
         anos_disponiveis = Atendimento.objects.dates("data_atendimento", "year")
+        tabela_por_ano = []
+        for ano_disponivel in anos_disponiveis:
+            linha_ano = [ano_disponivel.year]  # Inicia a linha com o ano
+            atendimentos_ano = Atendimento.objects.filter(data_atendimento__year=ano_disponivel.year)
+            meses_totais = {mes: 0 for mes in meses_nomes}
+            for atendimento in atendimentos_ano:
+                mes_numero = atendimento.data_atendimento.month
+                mes = meses_nomes[mes_numero - 1]
+                meses_totais[mes] += 1
+            linha_ano.extend([meses_totais[mes] for mes in meses_nomes])  # Adiciona os dados mensais
+            tabela_por_ano.append(linha_ano)
+
         context = {
             "atendimentos_por_local": atendimentos_por_local,
             "meses_nomes": meses_nomes,
             "ano_selecionado": ano,
             "anos_disponiveis": anos_disponiveis,
+            "tabela_por_ano": tabela_por_ano,  # Nova tabela
+            "is_gestor": is_gestor,  # Variável adicionada ao contexto
         }
 
         # Renderiza o template HTML do relatório
         return render(request, "compaz/relatorio.html", context)
-    
+
     def gerar_pdf(self, ano):
         """ Método separado para gerar e baixar o PDF """
         buffer = io.BytesIO()
@@ -80,21 +99,20 @@ class RelatorioView(View):
         estilos = getSampleStyleSheet()
         estilo_titulo = estilos["Title"]
 
-        # Criando o título
-        titulo = f"Relatório do Espaço Conecta do Ano - {ano}"
-        elemento_titulo = Paragraph(titulo, estilo_titulo)
+        # Criando o título para a primeira tabela
+        titulo_principal = f"Relatório do Espaço Conecta do Ano - {ano}"
+        elemento_titulo_principal = Paragraph(titulo_principal, estilo_titulo)
 
         # Adicionando espaço após o título
         espaçamento = Spacer(1, 20)
 
-        # Cabeçalho da tabela
+        # Cabeçalho da primeira tabela (por local)
         meses_nomes = [
             "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
             "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
         ]
         tabela_dados = [["Local do Serviço"] + meses_nomes + ["Total"]]
 
-        # Obtendo atendimentos agrupados pelo ano selecionado
         atendimentos = Atendimento.objects.filter(data_atendimento__year=ano)
         atendimentos_por_local = {}
 
@@ -106,53 +124,68 @@ class RelatorioView(View):
                 atendimentos_por_local[local] = {m: 0 for m in meses_nomes}
             atendimentos_por_local[local][mes] += 1
 
-        # Adicionando total por local
         for local, meses_totais in atendimentos_por_local.items():
-            meses_totais["Total"] = sum(meses_totais.values())
-
-        # Preenchendo os dados na tabela
-        totais_por_mes = {mes: 0 for mes in meses_nomes}  # Inicia os totais por mês
-        total_geral = 0
-
-        for local, meses_totais in atendimentos_por_local.items():
-            linha = [local]
-            for mes in meses_nomes:
-                valor = meses_totais.get(mes, 0)
-                linha.append(valor)
-                totais_por_mes[mes] += valor  # Soma os valores por mês
-            total_local = meses_totais["Total"]
-            linha.append(total_local)
-            total_geral += total_local  # Soma o total geral
+            meses_totais["Total"] = sum(meses_totais[m] for m in meses_nomes)
+            linha = [local] + [meses_totais[m] for m in meses_nomes] + [meses_totais["Total"]]
             tabela_dados.append(linha)
 
-        # Adiciona a linha de totais no final
-        linha_totais = ["Total"]
-        for mes in meses_nomes:
-            linha_totais.append(totais_por_mes[mes])
-        linha_totais.append(total_geral)
-        tabela_dados.append(linha_totais)
+        totais_por_mes = {m: sum(meses_totais[m] for meses_totais in atendimentos_por_local.values()) for m in meses_nomes}
+        total_geral = sum(meses_totais["Total"] for meses_totais in atendimentos_por_local.values())
+        tabela_dados.append(["Total"] + [totais_por_mes[m] for m in meses_nomes] + [total_geral])
 
-        # Estilizando a tabela
-        tabela = Table(tabela_dados)
-        tabela.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Cabeçalho
+        tabela_local = Table(tabela_dados)
+        tabela_local.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 12),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
             ('GRID', (0, 0), (-1, -1), 1, colors.black),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Corpo
-            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),  # Linha de totais
-            ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),  # Cor da linha de totais
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
         ]))
 
+        # Criando o título para a segunda tabela
+        titulo_global = f"Relatório do Espaço Conecta Global"
+        elemento_titulo_global = Paragraph(titulo_global, estilo_titulo)
+
+        # Criando a segunda tabela (dados por ano)
+        anos_disponiveis = Atendimento.objects.dates("data_atendimento", "year")
+        tabela_por_ano = [["Ano"] + meses_nomes]
+        for ano_disponivel in anos_disponiveis:
+            linha_ano = [ano_disponivel.year]
+            atendimentos_ano = Atendimento.objects.filter(data_atendimento__year=ano_disponivel.year)
+            meses_totais = {mes: 0 for mes in meses_nomes}
+            for atendimento in atendimentos_ano:
+                mes_numero = atendimento.data_atendimento.month
+                mes = meses_nomes[mes_numero - 1]
+                meses_totais[mes] += 1
+            linha_ano.extend([meses_totais[mes] for mes in meses_nomes])
+            tabela_por_ano.append(linha_ano)
+
+        tabela_anos = Table(tabela_por_ano)
+        tabela_anos.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+        ]))
+
+        # Atualizando a ordem dos elementos
+        elementos = [
+            elemento_titulo_global,  # Adiciona o título da segunda tabela primeiro
+            Spacer(1, 10),           # Espaço entre título e tabela
+            tabela_anos,             # Adiciona a segunda tabela
+            Spacer(1, 20),           # Espaço entre tabelas
+            elemento_titulo_principal,  # Adiciona o título da primeira tabela
+            espaçamento,
+            tabela_local             # Adiciona a primeira tabela
+        ]
+
         # Construindo o documento
-        elementos = [elemento_titulo, espaçamento, tabela]
         pdf.build(elementos)
         buffer.seek(0)
 
-        return FileResponse(buffer, filename=f"relatorio_{ano}.pdf")      
+        return FileResponse(buffer, filename=f"relatorio_{ano}.pdf") 
 
 
 # Configurar locale corretamente para exibir os registro por mês a mês no template
@@ -161,9 +194,31 @@ try:
 except locale.Error:
     locale.setlocale(locale.LC_TIME, 'C')  # Fallback caso o sistema não tenha pt_BR.UTF-8
 
+# @login_required
+# def atendimento_geral(request):
+
+#     atendimentos = Atendimento.objects.all().order_by('-data_atendimento', '-horario_atendimento')
+
+#     # Agrupar atendimentos por mês
+#     atendimentos_por_mes = defaultdict(list)
+#     for atendimento in atendimentos:
+#         mes_ano = atendimento.data_atendimento.strftime('%B de %Y')
+#         mes_ano = mes_ano.encode('latin1').decode('utf-8').capitalize()  # Correção de encoding
+#         atendimentos_por_mes[mes_ano].append(atendimento)
+
+#     return render(request, 'compaz/atendimentos_geral.html', {'atendimentos_por_mes': dict(atendimentos_por_mes)})
+    
 @login_required
 def atendimento_geral(request):
     atendimentos = Atendimento.objects.all().order_by('-data_atendimento', '-horario_atendimento')
+
+    # Verificar se o usuário pertence ao grupo "Gerentes de Atendimento"
+    is_gerente = request.user.groups.filter(name="Gerentes de Atendimento").exists()
+    
+    #print("is_gerente:", is_gerente)  # Testa o valor no console
+
+    if not is_gerente:
+        return redirect('access_denied')  # Redireciona para uma página de acesso negado
 
     # Agrupar atendimentos por mês
     atendimentos_por_mes = defaultdict(list)
@@ -172,7 +227,11 @@ def atendimento_geral(request):
         mes_ano = mes_ano.encode('latin1').decode('utf-8').capitalize()  # Correção de encoding
         atendimentos_por_mes[mes_ano].append(atendimento)
 
-    return render(request, 'compaz/atendimentos_geral.html', {'atendimentos_por_mes': dict(atendimentos_por_mes)})
+    return render(request, 'compaz/atendimentos_geral.html', {
+        'atendimentos_por_mes': dict(atendimentos_por_mes),
+        'is_gerente': is_gerente  # Passa a variável para o template
+    })
+
 
 @login_required
 def meus_atendimentos(request):
@@ -205,11 +264,8 @@ def atendimento_unidade(request):
     return render(request, 'compaz/atendimentos_unidade.html', {'atendimentos_por_mes': dict(atendimentos_por_mes)})
 
 
-
-
 # WEBHOOK_URL = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook-test/compaz"
 WEBHOOK_URL = "https://webhook-n8n-dev-conectarecife.recife.pe.gov.br/webhook-test/espaconecta" #tenorio
-
                 
 
 @login_required
@@ -292,4 +348,37 @@ class BuscarServicosView(View):
 def redirecionar_meus_atendimentos(request):
     # Redireciona para a página "Meus Atendimentos" se autenticado
     return redirect('meus_atendimentos')
+
+
+@login_required
+def excluir_atendimento(request, atendimento_id):
+    """
+    Exclui um atendimento específico, permitido apenas para membros do Grupo de Exclusão.
+    """
+    atendimento = get_object_or_404(Atendimento, id=atendimento_id)
+
+    # Verifica se o usuário pertence ao grupo "Grupo de Exclusão"
+    pertence_grupo_exclusao = request.user.groups.filter(name="Grupo de Exclusão").exists()
+
+    if not pertence_grupo_exclusao:
+        return HttpResponseForbidden("Você não tem permissão para excluir este atendimento.")
+
+    if request.method == 'POST':
+        # Exclui o atendimento
+        atendimento.delete()
+        messages.success(request, "Atendimento excluído com sucesso.")
+        #return redirect('meus_atendimentos')  # Redireciona para o template de atendimentos
+        
+        # Verifica se há um parâmetro `next` na requisição
+        next_url = request.GET.get('next', 'meus_atendimentos')  # Padrão: meus_atendimentos
+        return redirect(next_url)  # Redireciona para a página de origem ou padrão
+
+    # Renderiza os templates com o botão de exclusão visível somente para o grupo
+    context = {
+        'atendimento': atendimento,
+        'pertence_grupo_exclusao': pertence_grupo_exclusao,
+    }
+    return render(request, 'compaz/meus_atendimentos.html', context)
+
+
 

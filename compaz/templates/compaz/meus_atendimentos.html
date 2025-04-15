@@ -28,20 +28,24 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'atendimentos_unidade' %}active{% endif %}" href="{% url 'atendimentos_unidade' %}">
+            <a class="nav-link fw-bold{% if request.resolver_match.url_name == 'atendimentos_unidade' %}active{% endif %}" href="{% url 'atendimentos_unidade' %}">
                 <i class="fas fa-building"></i> {{ user.local_servico }}
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'atendimentos_geral' %}active{% endif %}" href="{% url 'atendimentos_geral' %}">
-                <i class="fas fa-globe"></i> Todos os Atendimentos
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'relatorio' %}active{% endif %} text-success fw-bold" href="{% url 'relatorio' %}">
-                <i class="fas fa-file-pdf"></i> Relatório
-            </a>
-        </li>
+        {% if is_gerente %}
+            <li class="nav-item">
+                <a class="nav-link fw-bold{% if request.resolver_match.url_name == 'atendimentos_geral' %}active{% endif %}" href="{% url 'atendimentos_geral' %}">
+                    <i class="fas fa-globe"></i> Todos os Atendimentos
+                </a>
+            </li>
+        {% endif %}
+        {% if is_gestor %} 
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'relatorio' %}active{% endif %} text-success fw-bold" href="{% url 'relatorio' %}">
+                    <i class="fas fa-file-pdf"></i> Relatórios
+                </a>
+            </li>
+        {% endif %}
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'alterar_senha' %}active{% endif %} text-warning fw-bold" href="{% url 'alterar_senha' %}">
                 <i class="fas fa-key"></i> Alterar Senha
@@ -52,7 +56,6 @@
                 <i class="fas fa-sign-out-alt"></i> Logout
             </a>
         </li>
-        
     </ul>
 
     <!-- Título principal -->
@@ -75,6 +78,9 @@
                     <th>Serviço</th>
                     <th>Forma do Atendimento</th>
                     <th>Resolvido</th>
+                    {% if pertence_grupo_exclusao %}
+                        <th>Ação</th> 
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
@@ -90,6 +96,39 @@
                     <td>{{ atendimento.nome_servico }}</td>
                     <td>{{ atendimento.forma_atendimento }}</td>
                     <td>{{ atendimento.problema_resolvido|yesno:"Sim,Não" }}</td>
+                    {% if pertence_grupo_exclusao %}
+                    <td>
+                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal{{ atendimento.id }}">
+                            Excluir
+                        </button>
+                    </td>
+                    {% endif %}
+                </tr>
+
+                <!-- Modal de Confirmação de Exclusão -->
+                <div class="modal fade" id="confirmDeleteModal{{ atendimento.id }}" tabindex="-1" aria-labelledby="confirmDeleteModalLabel{{ atendimento.id }}" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmDeleteModalLabel{{ atendimento.id }}">Confirmar Exclusão</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Tem certeza de que deseja excluir o atendimento do cidadão <strong>{{ atendimento.nome_cidadao }}</strong>, realizado em <strong>{{ atendimento.data_atendimento|date:"d/m/Y" }}</strong>?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <form method="POST" action="{% url 'excluir_atendimento' atendimento.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Confirmar</button>
+                                </form>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <tr>
+                    <td colspan="11" class="text-center text-muted">Nenhum atendimento encontrado.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -100,4 +139,4 @@
     {% endfor %}
 </div>
 
-{% endblock content %}
+{% endblock %}
