@@ -1,9 +1,7 @@
 from django.urls import path, reverse_lazy
 from . import views
 from django.contrib.auth import views as auth_views
-
-from .views import excluir_atendimento
-
+from .views import excluir_atendimento, proxy_dashboard
 
 
 urlpatterns = [
@@ -28,7 +26,8 @@ urlpatterns = [
     path('relatorio/', views.RelatorioView.as_view(), name='relatorio'),
     #path('excluir-atendimento/<int:atendimento_id>/', excluir_atendimento, name='excluir_atendimento'),
     path('excluir-atendimento/<int:atendimento_id>/', views.excluir_atendimento, name='excluir_atendimento'),
-
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('proxy-dashboard/', proxy_dashboard, name='proxy_dashboard'),
 ]
 
 # https://www.youtube.com/watch?v=-ZK5eCyJIWo

@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
+  
 
 <div class="container-fluid mt-4 px-4">
     <div class="alert alert-primary text-center" role="alert">
@@ -46,6 +47,7 @@
                 </a>
             </li>
         {% endif %}
+
         <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'alterar_senha' %}active{% endif %} text-warning fw-bold" href="{% url 'alterar_senha' %}">
                 <i class="fas fa-key"></i> Alterar Senha

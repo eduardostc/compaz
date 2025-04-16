@@ -381,4 +381,18 @@ def excluir_atendimento(request, atendimento_id):
     return render(request, 'compaz/meus_atendimentos.html', context)
 
 
+def dashboard(request):
+    return render(request, 'compaz/dashboard.html')
+
+
+from django.http import HttpResponse
+
+def proxy_dashboard(request):
+    url = "https://sesuiteh.recife.pe.gov.br/softexpert/workspace?page=dashboard,ff80808192fc332701961bf41ac47432,ff80808192fc332701961bf41ac47433"
+    response = requests.get(url)
+    return HttpResponse(response.content)
+
+
+
+
 
